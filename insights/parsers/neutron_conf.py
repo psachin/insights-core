@@ -32,4 +32,5 @@ from insights.specs import Specs
 @parser(Specs.neutron_conf)
 class NeutronConf(IniConfigFile):
     """Class to parse file ``neutron.conf``."""
-    pass
+    def parse_content(content):
+        return content

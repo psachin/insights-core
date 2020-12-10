@@ -16,7 +16,7 @@ from insights.core.context import HostContext
 
 from insights.core.dr import SkipComponent
 from insights.core.plugins import datasource
-from insights.core.spec_factory import RawFileProvider
+from insights.core.spec_factory import RawFileProvider, DatasourceProvider
 from insights.core.spec_factory import simple_file, simple_command, glob_file
 from insights.core.spec_factory import first_of, foreach_collect, foreach_execute
 from insights.core.spec_factory import first_file, listdir
@@ -199,6 +199,26 @@ class DefaultSpecs(Specs):
     cinder_api_log = first_file(["/var/log/containers/cinder/cinder-api.log", "/var/log/cinder/cinder-api.log"])
     cinder_conf = first_file(["/var/lib/config-data/puppet-generated/cinder/etc/cinder/cinder.conf", "/etc/cinder/cinder.conf"])
     cinder_volume_log = first_file(["/var/log/containers/cinder/volume.log", "/var/log/containers/cinder/cinder-volume.log", "/var/log/cinder/volume.log"])
+
+    @datasource(HostContext)
+    def cloud_init_network_config(broker):
+        import yaml
+        import json
+        relative_path = '/etc/cloud/cloud.cfg'
+        network_config = ''
+        with open(relative_path, 'r') as f:
+            data = f.read()
+
+        content = yaml.load(data, Loader=yaml.SafeLoader)
+        if content.get('network', None):
+            network_config = content.get('network')
+
+        if network_config:
+            return DatasourceProvider(content=json.dumps(network_config), relative_path=relative_path)
+
+        raise SkipComponent()
+
+
     cloud_init_custom_network = simple_file("/etc/cloud/cloud.cfg.d/99-custom-networking.cfg")
     cloud_init_log = simple_file("/var/log/cloud-init.log")
     cluster_conf = simple_file("/etc/cluster/cluster.conf")

@@ -10,12 +10,13 @@ data sources that standard Insights `Parsers` resolve against.
 
 import logging
 import re
+import json
 
 from insights.core.context import HostContext
 
 from insights.core.dr import SkipComponent
 from insights.core.plugins import datasource
-from insights.core.spec_factory import RawFileProvider
+from insights.core.spec_factory import RawFileProvider, DatasourceProvider
 from insights.core.spec_factory import simple_file, simple_command, glob_file
 from insights.core.spec_factory import first_of, command_with_args
 from insights.core.spec_factory import foreach_collect, foreach_execute
@@ -770,6 +771,22 @@ class DefaultSpecs(Specs):
     up2date = simple_file("/etc/sysconfig/rhn/up2date")
     up2date_log = simple_file("/var/log/up2date")
     uptime = simple_command("/usr/bin/uptime")
+
+    @datasource(HostContext)
+    def users_password_locked(broker):
+        '''Return all users of which the password is locked'''
+        relative_path = '/home/psachin/shadow'
+        users = []
+        pattern = re.compile("(.*)\:!!(?!\:)")
+        with open(relative_path, 'r') as f:
+            for line in f.readlines():
+                match = pattern.search(line)
+                if match:
+                    users.append(match.groups()[0])
+
+        return DatasourceProvider(content=json.dumps(users), relative_path=relative_path)
+
+
     usr_journald_conf_d = glob_file(r"usr/lib/systemd/journald.conf.d/*.conf")  # note that etc_journald.conf.d also exists
     vdo_status = simple_command("/usr/bin/vdo status")
     vgdisplay = simple_command("/sbin/vgdisplay")

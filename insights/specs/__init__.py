@@ -663,6 +663,7 @@ class Specs(SpecSet):
     up2date_log = RegistryPoint(filterable=True)
     uploader_log = RegistryPoint()
     uptime = RegistryPoint()
+    users_password_locked = RegistryPoint()
     usr_journald_conf_d = RegistryPoint(multi_output=True)
     var_qemu_xml = RegistryPoint(multi_output=True)
     vdsm_conf = RegistryPoint()

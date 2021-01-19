@@ -242,6 +242,7 @@ class InsightsArchiveSpecs(Specs):
     tuned_adm = simple_file("insights_commands/tuned-adm_list")
     uname = simple_file("insights_commands/uname_-a")
     uptime = simple_file("insights_commands/uptime")
+    users_password_locked = simple_file("insights_commands/python_-m_insights.tools.cat_--no-header_users_password_locked")
     version_info = simple_file("version_info")
     vdo_status = simple_file("insights_commands/vdo_status")
     vgdisplay = simple_file("insights_commands/vgdisplay")
